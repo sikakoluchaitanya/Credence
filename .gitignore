@@ -1,0 +1,57 @@
+# Node.js
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+dist/
+.env
+.env.local
+.env.*.local
+
+# Logs
+logs/
+*.log
+logs/*.log
+*.log.*
+
+# Dependency directories
+/.pnp
+.pnp.js
+
+# Build directories
+build/
+out/
+.next/
+
+# Static files
+.DS_Store
+*.lock
+
+# Testing
+coverage/
+*.lcov
+
+# Editor configurations
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# System files
+Thumbs.db
+*.bak
+*.tmp
+
+# Temporary files
+*.cache/
+*.tmp/
+
+# Framework-specific
+public/static/
+.cache/
+storybook-static/
+.staging/
+
+# Misc
+*.bak
