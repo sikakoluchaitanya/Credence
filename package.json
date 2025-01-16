@@ -1,7 +1,10 @@
 {
   "name": "credence",
   "version": "1.0.0",
-  "workspaces":["apps/*","packages/*"],
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "turbo run build",
@@ -13,5 +16,8 @@
   "description": "",
   "devDependencies": {
     "turbo": "^2.3.3"
+  },
+  "dependencies": {
+    "uuid": "^11.0.5"
   }
 }
