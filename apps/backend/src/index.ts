@@ -7,6 +7,7 @@ import { errorHandler } from "./middlewares/errorHandler";
 import { HttpStatus } from "./config/http.config";
 import { asyncHandler } from "./middlewares/asyncHandler";
 import authRoutes from "./modules/auth/auth.routes";
+import connectdb from "./database/database";
 
 const app = express();
 const BASE_PATH = config.BASE_PATH;
@@ -36,4 +37,5 @@ app.use(errorHandler);
 
 app.listen(config.PORT, async () => {
     console.log(`Server listening on port ${config.PORT} in development mode`);
+    await connectdb();
 })

@@ -4,7 +4,7 @@ import { AppError } from "./AppError";
 
 
 export class NotFoundException extends AppError {
-    constructor(message: "Resource not found", errorCode?: ErrorCode) {
+    constructor(message:string = "Resource not found", errorCode?: ErrorCode) {
         super(
             message,
             HttpStatus.NOT_FOUND,
@@ -14,7 +14,7 @@ export class NotFoundException extends AppError {
 }
 
 export class BadRequestException extends AppError {
-    constructor(message: "Bad request", errorCode?: ErrorCode) {
+    constructor(message:string = "bad request", errorCode?: ErrorCode) {
         super(
             message,
             HttpStatus.BAD_REQUEST,
@@ -24,7 +24,7 @@ export class BadRequestException extends AppError {
 }
 
 export class UnauthorizedException extends AppError {
-    constructor(message: "Unauthorized", errorCode?: ErrorCode) {
+    constructor(message:string = "Unauthorized", errorCode?: ErrorCode) {
         super(
             message,
             HttpStatus.UNAUTHORIZED,
@@ -34,7 +34,7 @@ export class UnauthorizedException extends AppError {
 }
 
 export class InternalServerException extends AppError {
-    constructor(message: "Internal Server Error", errorCode?: ErrorCode) {
+    constructor(message:string ="Internal Server Error", errorCode?: ErrorCode) {
         super(
             message,
             HttpStatus.INTERNAL_SERVER_ERROR,
@@ -45,7 +45,7 @@ export class InternalServerException extends AppError {
 
 export class HttpsEception extends AppError {
     constructor(
-        message: "Http Exception Error",
+        message:string = "Http Exception Error",
         statusCode: HttpStatusCode, 
         errorCode?: ErrorCode,
     ) {
