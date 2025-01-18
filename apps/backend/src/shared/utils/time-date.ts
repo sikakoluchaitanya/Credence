@@ -5,6 +5,8 @@ export const thirtyDaysFromNow = (): Date => {
     return new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
 }
 
+export const ONE_DAY_IN_MS = 1000 * 60 * 60 * 24;
+
 export const fortyFiveMinutesFromNow = (): Date => {
     const now = new Date();
     now.setMinutes(now.getMinutes() + 45);
