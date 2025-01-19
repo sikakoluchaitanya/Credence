@@ -1,8 +1,10 @@
 import { z } from "zod";
 
 // constant validator 
-const emailSchema = z.string().trim().email().min(1).max(255);
-const passwordSchema = z.string().trim().min(6).max(255);
+export const emailSchema = z.string().trim().email().min(1).max(255);
+export const passwordSchema = z.string().trim().min(6).max(255);
+export const verificationCodeSchema = z.string().trim().min(1).max(255);
+
 
 export const registerSchema = z.object({
     name: z.string().trim().min(1).max(255),
@@ -19,3 +21,12 @@ export const loginSchema = z.object({
     password: passwordSchema,
     userAgent: z.string().optional(),
 });
+
+export const verificationEmailSchema = z.object({ 
+    code: verificationCodeSchema 
+});
+
+export const resetPasswordSchema = z.object({
+    password: passwordSchema,
+    verificationCode: verificationCodeSchema
+})

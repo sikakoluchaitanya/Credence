@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { asyncHandler } from "../../middlewares/asyncHandler";
 import { Authservice } from "./auth.service";
 import { HttpStatus } from "../../config/http.config";
-import { loginSchema, registerSchema } from "../../shared/validators/auth.validator";
+import { loginSchema, registerSchema, verificationEmailSchema } from "../../shared/validators/auth.validator";
 import { getAccessTokenCookieOptions, getRefreshTokenCookieOptions, setAuthenticationCookies } from "../../shared/utils/cookie";
 import { UnauthorizedException } from "../../shared/utils/catch-errors";
 
@@ -72,6 +72,14 @@ export class AuthController {
                     .json({
                         message: "Token refreshed successfully",
                     })
+        }
+    )
+
+    public verifyEmail = asyncHandler(
+        async(req: Request, res: Response): Promise<any> => {
+            const {code} = verificationEmailSchema.parse(req.body);
+            await this.authService.verifyEmail(code);
+            return res.status(HttpStatus.OK).json({message: "Email verified successfully"});
         }
     )
 }
