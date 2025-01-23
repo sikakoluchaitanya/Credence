@@ -8,6 +8,9 @@ import { LoginDto, RegisterDto } from "../../shared/interfaces/auth.interface";
 import { BadRequestException, UnauthorizedException } from "../../shared/utils/catch-errors";
 import { calculateExpirationDate, fortyFiveMinutesFromNow, ONE_DAY_IN_MS } from "../../shared/utils/time-date";
 import { RefreshTokenPayload, refreshTokenSignOptions, signJwtToken, verifyJwtToken } from "../../shared/utils/jwt";
+import { mailer_sender, sendEmail } from "../../mailers/mailer";
+import { verifyEmailTemplate } from "../../mailers/templates/templates";
+import { verify } from "jsonwebtoken";
 
 
 export class Authservice {
@@ -33,13 +36,24 @@ export class Authservice {
 
         const userId = newUser._id;
 
-        const verificationCode = await verificationCodeModel.create({
+        const verification = await verificationCodeModel.create({
             userId,
             type: VerificationEnum.EMAIL_VERIFICATION,
             expiredAt: fortyFiveMinutesFromNow(),
         })
 
-        // email verification link 
+        const verificationUrl = `${config.APP_ORIGIN}/confirm-account?code=${verification.code}`;
+        try {
+            await sendEmail({
+                to: newUser.email,
+                from: mailer_sender,
+                ...verifyEmailTemplate(verificationUrl),
+            });
+        } catch (error) {
+            console.error("Email sending failed:", error);
+            throw new Error("Failed to send verification email");
+        }
+        
 
         return {
             user: newUser
