@@ -4,13 +4,15 @@ import userModel from "../../database/models/user.model";
 import verificationCodeModel from "../../database/models/verification.modal";
 import { ErrorCode } from "../../shared/enums/error-code.enum";
 import VerificationEnum from "../../shared/enums/verification-code.enum";
-import { LoginDto, RegisterDto } from "../../shared/interfaces/auth.interface";
-import { BadRequestException, UnauthorizedException } from "../../shared/utils/catch-errors";
-import { calculateExpirationDate, fortyFiveMinutesFromNow, ONE_DAY_IN_MS } from "../../shared/utils/time-date";
+import { LoginDto, RegisterDto, ResetPasswordDto } from "../../shared/interfaces/auth.interface";
+import { BadRequestException, NotFoundException, UnauthorizedException, HttpException, InternalServerException } from "../../shared/utils/catch-errors";
+import { anHourFromNow, calculateExpirationDate, fortyFiveMinutesFromNow, ONE_DAY_IN_MS, threeMinutesAgo } from "../../shared/utils/time-date";
 import { RefreshTokenPayload, refreshTokenSignOptions, signJwtToken, verifyJwtToken } from "../../shared/utils/jwt";
 import { mailer_sender, sendEmail } from "../../mailers/mailer";
-import { verifyEmailTemplate } from "../../mailers/templates/templates";
+import { passwordResetTemplate, verifyEmailTemplate } from "../../mailers/templates/templates";
 import { verify } from "jsonwebtoken";
+import { HttpStatus } from "../../config/http.config";
+import { hashValue } from "../../shared/utils/bycrypt";
 
 
 export class Authservice {
@@ -186,4 +188,93 @@ export class Authservice {
             user: updatedUser
         }
     }
+
+    public async forgotPassword(email: string) {
+        const user = await userModel.findOne({
+            email
+        });
+
+        if(!user) {
+            throw new NotFoundException("User not found");
+        }
+
+        // check email rate limit
+        const timeago = threeMinutesAgo();
+        const maxAttempts = 2;
+
+        const count = await verificationCodeModel.countDocuments({  // a way of counting documents
+            userId: user._id,
+            type: VerificationEnum.PASSWORD_RESET,
+            createdAt: { $gt: timeago },
+        });
+
+        if (count >= maxAttempts) {
+            throw new HttpException(
+                "Too many attempts. Please try again later.",
+                HttpStatus.TOO_MANY_REQUESTS,
+                ErrorCode.AUTH_TOO_MANY_ATTEMPTS
+            );
+        }
+
+        const expiresAt = anHourFromNow();
+        const validCode = await verificationCodeModel.create({
+            userId: user._id,
+            type: VerificationEnum.PASSWORD_RESET,
+            expiredAt: expiresAt,
+        });
+        
+        const resetLink = `${config.APP_ORIGIN}/reset-password?code=${validCode.code}&exp=${expiresAt.getTime()}`;
+            const { data, error } = await sendEmail({
+                to: user.email,
+                from: mailer_sender,
+                ...passwordResetTemplate(resetLink),
+            });
+
+            if(!data){
+                throw new InternalServerException(`${error?.name} ${error?.message}`);
+            }
+
+            return {
+                url: resetLink,
+                emailId: data.id
+            }
+    }
+
+    public async resetPassword( {password, verificationCode}: ResetPasswordDto ) {
+        const validCode = await verificationCodeModel.findOne({
+            code: verificationCode,
+            type: VerificationEnum.PASSWORD_RESET,
+            expiresAt: { $gt: Date.now() }
+        })
+
+        if(!validCode) {
+            throw new NotFoundException("Invalid or expired verification code");
+        }
+
+        const hashedPassword = await hashValue(password);
+
+        const updatedUser =  await userModel.findByIdAndUpdate(
+            validCode.userId,
+            {
+                password: hashedPassword
+            }
+        )
+
+        if(!updatedUser) {
+            throw new BadRequestException(
+                "Unable to reset password",
+            )
+        }
+
+        await validCode.deleteOne();
+
+        await sessionModel.deleteMany({
+            userId: updatedUser._id,
+        })
+
+        return {
+            user: updatedUser
+        }
+    } 
+
 }

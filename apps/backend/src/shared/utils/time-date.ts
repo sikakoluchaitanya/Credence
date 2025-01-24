@@ -13,6 +13,10 @@ export const fortyFiveMinutesFromNow = (): Date => {
     return now;
 }
 
+export const threeMinutesAgo = (): Date => new Date(Date.now() - 3 * 60 * 1000);
+export const anHourFromNow = (): Date => new Date(Date.now() + 60 * 60 * 1000);
+export const tenMinutesAgo = (): Date => new Date(Date.now() - 10 * 60 * 1000); 
+
 export const calculateExpirationDate = (expiresIn: string = "15m"): Date => {
     const match = expiresIn.match(/^(\d+)([mhd])$/);
     if(!match) throw new Error('Invalid expiresIn format. use "15m", "1h" ' );

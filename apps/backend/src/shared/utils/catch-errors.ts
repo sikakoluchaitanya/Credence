@@ -43,7 +43,7 @@ export class InternalServerException extends AppError {
     }
 }
 
-export class HttpsEception extends AppError {
+export class HttpException extends AppError {
     constructor(
         message:string = "Http Exception Error",
         statusCode: HttpStatusCode, 
