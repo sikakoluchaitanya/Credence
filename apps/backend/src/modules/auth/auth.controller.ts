@@ -4,7 +4,7 @@ import { Authservice } from "./auth.service";
 import { HttpStatus } from "../../config/http.config";
 import { emailSchema, loginSchema, registerSchema, resetPasswordSchema, verificationEmailSchema } from "../../shared/validators/auth.validator";
 import { clearAuthenticationCookies, getAccessTokenCookieOptions, getRefreshTokenCookieOptions, setAuthenticationCookies } from "../../shared/utils/cookie";
-import { UnauthorizedException } from "../../shared/utils/catch-errors";
+import { NotFoundException, UnauthorizedException } from "../../shared/utils/catch-errors";
 
 
 export class AuthController {
@@ -101,6 +101,18 @@ export class AuthController {
             return clearAuthenticationCookies(res).status(HttpStatus.OK).json({
                 message: "Password reset successfully",
             })
+        }
+    )
+
+    public logout = asyncHandler(
+        async(req: Request, res: Response): Promise<any> => {
+            const sessionId = req.sessionId;
+            if(!sessionId) {
+                throw new NotFoundException("session is not valid or not found");
+            }
+            await this.authService.logout(sessionId);
+
+            return clearAuthenticationCookies(res).status(HttpStatus.OK).json({message: "User logged out successfully"});
         }
     )
 }

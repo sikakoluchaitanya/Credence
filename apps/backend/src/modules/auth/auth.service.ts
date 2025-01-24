@@ -277,4 +277,7 @@ export class Authservice {
         }
     } 
 
+    public async logout(sessionId: string) {
+        return await sessionModel.findByIdAndDelete(sessionId);
+    }
 }
