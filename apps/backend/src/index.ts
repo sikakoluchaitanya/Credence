@@ -9,6 +9,8 @@ import { asyncHandler } from "./middlewares/asyncHandler";
 import authRoutes from "./modules/auth/auth.routes";
 import connectdb from "./database/database";
 import passport from "./middlewares/passport";
+import { authenticateJWT } from "./shared/strats/jwt.strategy";
+import sessionRoutes from "./modules/sessions/session.routes";
 
 
 const app = express();
@@ -35,6 +37,7 @@ app.get("/",
 )
 
 app.use(`${BASE_PATH}/auth`, authRoutes);
+app.use(`${BASE_PATH}/session`, authenticateJWT, sessionRoutes);
 
 app.use(errorHandler);
 
