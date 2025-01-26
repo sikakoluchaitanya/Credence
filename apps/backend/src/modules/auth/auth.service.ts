@@ -84,6 +84,15 @@ export class Authservice {
             )
         }
 
+        if(user.userPreferences.enable2FA) {
+            return{
+                user:null,
+                mfaRequired: true,
+                accessToken: "",
+                refreshToken: ""
+            }
+        }
+
         const session = await sessionModel.create({
             userId: user._id,
             userAgent
