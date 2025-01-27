@@ -1,4 +1,5 @@
-import jwt, { SignOptions, VerifyOptions } from "jsonwebtoken";
+import jwt from "jsonwebtoken";
+import { SignOptions, VerifyOptions } from "jsonwebtoken";
 import { SessionDocument } from "../../database/models/session.modal";
 import { UserDocument } from "../../database/models/user.model"
 import { config } from "../../config/app.config";
@@ -21,12 +22,12 @@ const defaults: SignOptions = {
 }
 
 export const accessTokenSignOptions: SignOptsAndSecret = {
-    expiresIn: config.JWT.EXPIRES_IN,
+    expiresIn: config.JWT.EXPIRES_IN as SignOptions["expiresIn"],
     secret: config.JWT.SECRET
 }
 
 export const refreshTokenSignOptions: SignOptsAndSecret = {
-    expiresIn: config.JWT.REFRESH_EXPIRES_IN,
+    expiresIn: config.JWT.REFRESH_EXPIRES_IN as SignOptions["expiresIn"],
     secret: config.JWT.REFRESH_SECRET
 }
 
