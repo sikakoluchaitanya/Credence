@@ -25,4 +25,5 @@ export const loginMutationFn = async (data: Logintype) => await API.post("/auth/
 export const registerMutationFn = async (data: registerType) => await API.post("/auth/register", data);
 export const forgotPasswordMutationFn = async (data: forgotPassword ) => await API.post("/auth/password/forgot", data);
 export const resetPasswordMutationFn = async (data: resetPasswordType) => await API.post("/auth/password/reset", data);
+export const verifyEmailMutationFn = async (data: {code: string}) => await API.post("/auth/verify/email", data);
 
