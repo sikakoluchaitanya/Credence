@@ -80,3 +80,5 @@ export const sessionsQueryFn = async () => {
 
 export const sessionDeleteMutation = async(id: string) => 
     await API.delete(`/session/${id}`);
+
+export const logoutMutationFn = async() => await API.post("/auth/logout");
