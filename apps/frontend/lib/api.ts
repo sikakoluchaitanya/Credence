@@ -1,4 +1,6 @@
+import { Session } from "inspector/promises";
 import API from "./axios-client";
+import { userAgent } from "next/server";
 
 type Logintype = {
     email: string;
@@ -37,6 +39,20 @@ type mfaLoginType = {
     email: string
 }
 
+type SessionType = {
+    _id: string;
+    userId: string;
+    userAgent: string;
+    createdAt: string;
+    expiresAt: string;
+    isCurrent: boolean;
+}
+
+type SessionResponseType = {
+    message: string;
+    sessions: SessionType[];
+}
+
 export const loginMutationFn = async (data: Logintype) => await API.post("/auth/login", data);
 export const registerMutationFn = async (data: registerType) => await API.post("/auth/register", data);
 export const forgotPasswordMutationFn = async (data: forgotPassword ) => await API.post("/auth/password/forgot", data);
@@ -57,3 +73,10 @@ export const revokeMFAMutationFn = async () => await API.post("/mfa/revoke", {})
 export const verifyMFALoginMutationFn = async (data: mfaLoginType) => 
     await API.post("/mfa/verify-login", data);
 
+export const sessionsQueryFn = async () => {
+    const response = await API.get<SessionResponseType>("/session/");
+    return response.data;
+};
+
+export const sessionDeleteMutation = async(id: string) => 
+    await API.delete(`/session/${id}`);

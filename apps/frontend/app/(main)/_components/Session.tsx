@@ -1,7 +1,44 @@
-import React from "react";
+"use client";
+
+import React, { useCallback } from "react";
 import SessionItem from "./Sessionitem";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { sessionDeleteMutation, sessionsQueryFn } from "@/lib/api";
+import { Loader } from "lucide-react";
+import { toast } from "@/hooks/use-toast";
 
 const Sessions = () => {
+  const { data, isLoading, refetch } = useQuery({
+    queryKey: ["sessions"],
+    queryFn: sessionsQueryFn,
+    staleTime: Infinity,
+  })
+
+  const { mutate, isPending} = useMutation({
+    mutationFn: sessionDeleteMutation
+  });
+  const sessions = data?.sessions || [];
+  const currentSession = sessions?.find((session) => session.isCurrent);
+  const othersessions = sessions?.filter((session) => session.isCurrent != true);
+
+  const handleDelete = useCallback((id: string) => {
+    mutate( id, {
+      onSuccess: () => {
+        refetch();
+        toast({
+          title: "Success",
+          description: "Session deleted successfully",
+        })
+      },
+      onError: (error) => {
+        toast({
+          title: "Error",
+          description: error.message,
+          variant: "destructive",
+        })
+      }
+    })
+  }, []);
   return (
     <div className="via-root to-root rounded-xl bg-gradient-to-r p-0.5">
       <div className="rounded-[10px] p-6">
@@ -13,8 +50,10 @@ const Sessions = () => {
           These are the sessions where your account is currently logged in. You
           can log out of each session.
         </p>
-
-        <div className="rounded-t-xl max-w-xl">
+        {isLoading ? (
+          <Loader size="35px" className="animate-spin" />
+        ) : (
+          <div className="rounded-t-xl max-w-xl">
           <div>
             <h5 className="text-base font-semibold">Current active session</h5>
             <p className="mb-6 text-sm text-[#0007149f] dark:text-gray-100">
@@ -23,27 +62,33 @@ const Sessions = () => {
             </p>
           </div>
           <div className="w-full">
-            <div className="w-full py-2 border-b pb-5">
-              <SessionItem
-                id=""
-                deviceName="Windows"
-                date="22 hours ago"
-                isCurrent={true}
-              />
-            </div>
+            {currentSession && (
+                <div className="w-full py-2 border-b pb-5">
+                  <SessionItem
+                    userAgent = {currentSession.userAgent}
+                    date = {currentSession.createdAt}
+                    expiresAt = {currentSession.expiresAt}
+                    isCurrent={currentSession.isCurrent}
+                    />
+                </div>
+            )}
             <div className="mt-4">
               <h5 className="text-base font-semibold">Other sessions</h5>
-              <ul className="mt-4">
-                <li>
-                  <SessionItem id="" deviceName="Android" date="22 hours ago" />
-                </li>
-                <li>
-                  <SessionItem id="" deviceName="Android" date="22 hours ago" />
-                </li>
+              <ul className="mt-4 w-full space-y-3 max-h-[400px] overflow-y-auto">
+                {othersessions?.map((session) => (
+                  <SessionItem
+                    loading={isPending}
+                    userAgent = {session.userAgent}
+                    date = {session.createdAt}
+                    expiresAt = {session.expiresAt}
+                    onRemove={() => handleDelete(session._id)}
+                  />
+                ))} 
               </ul>
             </div>
           </div>
         </div>
+        )}
       </div>
     </div>
   );
