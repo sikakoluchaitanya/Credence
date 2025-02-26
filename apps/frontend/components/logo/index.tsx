@@ -9,11 +9,11 @@ const Logo = (props: { url?: string; size?: string; fontSize?: string }) => {
                 style={{width: size, height: size}}
             >
                 <span className='font-bold text-grey-50' style={{fontSize: fontSize}}>
-                    Credence
+                    
                 </span>
             </Link>
         </div>
     )
-}   
+}
 
-export default Logo
+export default Logo;

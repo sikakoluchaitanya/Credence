@@ -14,8 +14,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import Logo from "@/components/logo";
-import { use } from "react";
+import Logo from "@/components/logo"; 
 import { useMutation } from "@tanstack/react-query";
 import { loginMutationFn } from "@/lib/api";
 import { useRouter } from "next/navigation";
@@ -68,7 +67,7 @@ export default function Login() {
         <Logo />
 
         <h1 className="text-xl tracking-[-0.16px] dark:text-[#fcfdffef] font-bold mb-1.5 mt-8 text-center sm:text-left">
-          Log in to Squeezy
+          Log in to Credence
         </h1>
         <p className="mb-8 text-center sm:text-left text-base dark:text-[#f1f7feb5] font-normal">
           Don't have an account?{" "}

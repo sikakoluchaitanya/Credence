@@ -2,55 +2,74 @@ import { Request, Response } from "express";
 import { asyncHandler } from "../../middlewares/asyncHandler";
 import { MfaService } from "./mfa.service";
 import { HttpStatus } from "../../config/http.config";
-import { verifyMfaSchema, verifyMfaForLoginSchema } from "../../shared/validators/mfa.validator";
+import {
+  verifyMfaForLoginSchema,
+  verifyMfaSchema,
+} from "../../shared/validators/mfa.validator";
 import { setAuthenticationCookies } from "../../shared/utils/cookie";
 
 export class MfaController {
-    private mfaservice: MfaService;
+  private mfaService: MfaService;
 
-    constructor(mfaservice: MfaService) {
-        this.mfaservice = mfaservice;
+  constructor(mfaService: MfaService) {
+    this.mfaService = mfaService;
+  }
+
+  public generateMFASetup = asyncHandler(
+    async (req: Request, res: Response) => {
+      const { secret, qrImageUrl, message } =
+        await this.mfaService.generateMFASetup(req);
+      return res.status(HttpStatus.OK).json({
+        message,
+        secret,
+        qrImageUrl,
+      });
     }
+  );
 
-    public generateMFASetup = asyncHandler(async (req: Request, res: Response) => {
-        const { secret, qrcode, message} = await this.mfaservice.generateMFASetup(req);
-
-        return res.status(HttpStatus.OK).json({
-            message,
-            secret,
-            qrcode,
-        })
-    })
-
-    public verifyMFASetup = asyncHandler(async (req: Request, res: Response) => {
-        const { code, secretKey } = verifyMfaSchema.parse({ ...req.body });
-
-        const { message, userPreferences } = await this.mfaservice.verifyMFASetup(req, code, secretKey);
-    })
-
-    public revokeMFASetup = asyncHandler(async (req: Request, res: Response) => {
-        const { message, userPreferences } = await this.mfaservice.revokeMFASetup(req);
-        return res.status(HttpStatus.OK).json({
-            message,
-            userPreferences,
-        })
-    })
-
-    public verifyMFAForLogin = asyncHandler(async (req: Request, res: Response) => {
-        const { code, email, userAgent } = verifyMfaForLoginSchema.parse({ 
-            ...req.body,
-            userAgent: req.headers["user-agent"],
-        });
-
-        const { user, accessToken, refreshToken } = await this.mfaservice.verifyMFAForLogin( code, email, userAgent);
-
-        return setAuthenticationCookies({
-            res, 
-            accessToken, 
-            refreshToken
-        }).status(HttpStatus.OK).json({
-            message: "",
-            user,
-        });
+  public verifyMFASetup = asyncHandler(async (req: Request, res: Response) => {
+    const { code, secretKey } = verifyMfaSchema.parse({
+      ...req.body,
     });
+    const { userPreferences, message } = await this.mfaService.verifyMFASetup(
+      req,
+      code,
+      secretKey
+    );
+    return res.status(HttpStatus.OK).json({
+      message: message,
+      userPreferences: userPreferences,
+    });
+  });
+
+  public revokeMFA = asyncHandler(async (req: Request, res: Response) => {
+    const { message, userPreferences } = await this.mfaService.revokeMFA(req);
+    return res.status(HttpStatus.OK).json({
+      message,
+      userPreferences,
+    });
+  });
+
+  public verifyMFAForLogin = asyncHandler(
+    async (req: Request, res: Response) => {
+      const { code, email, userAgent } = verifyMfaForLoginSchema.parse({
+        ...req.body,
+        userAgent: req.headers["user-agent"],
+      });
+
+      const { accessToken, refreshToken, user } =
+        await this.mfaService.verifyMFAForLogin(code, email, userAgent);
+
+      return setAuthenticationCookies({
+        res,
+        accessToken,
+        refreshToken,
+      })
+        .status(HttpStatus.OK)
+        .json({
+          message: "Verified & login successfully",
+          user,
+        });
+    }
+  );
 }

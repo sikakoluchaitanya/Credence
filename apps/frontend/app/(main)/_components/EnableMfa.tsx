@@ -28,15 +28,16 @@ import {
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { useAuthContext } from "@/context/auth-provider";
-import { useQuery, useMutation, useQueryClient, } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { mfaSetupQueryFn, mfaType, verifyMFAMutationFn } from "@/lib/api";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/hooks/use-toast";
 import RevokeMfa from "./_common/RevokeMfa";
 
 const EnableMfa = () => {
-  // const queryClient = useQueryClient();
+  //const queryClient = useQueryClient();
   const { user, refetch } = useAuthContext();
+  console.log(user);
   const [showKey, setShowKey] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [copied, setCopied] = useState(false);
@@ -70,7 +71,7 @@ const EnableMfa = () => {
   function onSubmit(values: z.infer<typeof FormSchema>) {
     const data = {
       code: values.pin,
-      secret: mfaData.secret,
+      secretKey: mfaData.secret,
     };
     mutate(data, {
       onSuccess: (response: any) => {
@@ -162,13 +163,13 @@ const EnableMfa = () => {
               </div>
               <div className="mt-4 flex flex-row items-center gap-4">
                 <div className=" shrink-0 rounded-md border p-2  border-[#0009321f] dark:border-gray-600 bg-white">
-                  {isLoading || !mfaData?.qrCode ? (
+                  {isLoading || !mfaData?.qrImageUrl ? (
                     <Skeleton className="w-[160px] h-[160px]" />
                   ) : (
                     <img
                       alt="QR code"
                       decoding="async"
-                      src={mfaData.qrCode}
+                      src={mfaData.qrImageUrl}
                       width="160"
                       height="160"
                       className="rounded-md"
@@ -185,7 +186,7 @@ const EnableMfa = () => {
                       <span>Copy setup key</span>
                       <button
                         disabled={copied}
-                        onClick={() => onCopy(mfaData?.qrCode)}
+                        onClick={() => onCopy(mfaData?.qrImageUrl)}
                       >
                         {copied ? (
                           <Check className="w-4 h-4" />
@@ -203,7 +204,7 @@ const EnableMfa = () => {
                     Can't scan the code?
                     <button
                       className="block text-primary transition duration-200 ease-in-out hover:underline
-                  dark:text-white"
+                   dark:text-white"
                       type="button"
                       onClick={() => setShowKey(true)}
                     >

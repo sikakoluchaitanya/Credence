@@ -3,7 +3,7 @@
 import React, { useCallback } from "react";
 import SessionItem from "./Sessionitem";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { sessionDeleteMutation, sessionsQueryFn } from "@/lib/api";
+import { sessionDelMutationFn, sessionsQueryFn } from "@/lib/api";
 import { Loader } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
@@ -15,7 +15,7 @@ const Sessions = () => {
   })
 
   const { mutate, isPending} = useMutation({
-    mutationFn: sessionDeleteMutation
+    mutationFn: sessionDelMutationFn
   });
   const sessions = data?.sessions || [];
   const currentSession = sessions?.find((session) => session.isCurrent);
@@ -46,7 +46,7 @@ const Sessions = () => {
           Sessions
         </h3>
         <p className="mb-6 max-w-xl text-sm text-[#0007149f] dark:text-gray-100 font-normal">
-          Sessions are the devices you are using or that have used your Squeezy
+          Sessions are the devices you are using or that have used your account.
           These are the sessions where your account is currently logged in. You
           can log out of each session.
         </p>
@@ -57,7 +57,7 @@ const Sessions = () => {
           <div>
             <h5 className="text-base font-semibold">Current active session</h5>
             <p className="mb-6 text-sm text-[#0007149f] dark:text-gray-100">
-              You’re logged into this Squeezy account on this device and are
+              You’re logged into this Credence account on this device and are
               currently using it.
             </p>
           </div>
@@ -77,6 +77,7 @@ const Sessions = () => {
               <ul className="mt-4 w-full space-y-3 max-h-[400px] overflow-y-auto">
                 {othersessions?.map((session) => (
                   <SessionItem
+                    key={session._id}
                     loading={isPending}
                     userAgent = {session.userAgent}
                     date = {session.createdAt}

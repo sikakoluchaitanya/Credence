@@ -32,16 +32,17 @@ export class SessionController {
     });
 
     public getSession = asyncHandler(async (req: Request, res: Response) => {
-        const sessionId = req.sessionId;
+        const sessionId = req?.sessionId;
 
         if(!sessionId) {
             throw new NotFoundException("session ID not found, please login again");
         }
 
-        const { user } = await this.sessionService.getSessionByid(sessionId);
+        const { user } = await this.sessionService.getSessionById(sessionId);
 
         return res.status(HttpStatus.OK).json({
             message: "Retrieved session successfully",
+            user,
         })
     });
 

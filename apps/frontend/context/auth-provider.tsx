@@ -14,7 +14,7 @@ type UserType = {
     };
 }
 
-type AuthcontextType = {
+type AuthContextType = {
     user?: UserType;
     error: any;
     isLoading: boolean;
@@ -23,7 +23,7 @@ type AuthcontextType = {
 }
 
 
-const AuthContext = createContext<AuthcontextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{children: React.ReactNode}> = ({children}) => {
     const {data, error, isLoading, isFetching, refetch} = useAuth();

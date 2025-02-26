@@ -77,7 +77,7 @@ export default function SignUp() {
             <Logo />
 
             <h1 className="text-xl tracking-[-0.16px] dark:text-[#fcfdffef] font-bold mb-1.5 mt-8 text-center sm:text-left">
-              Create a Squeezy account
+              Create a Credence account
             </h1>
             <p className="mb-6 text-center sm:text-left text-base dark:text-[#f1f7feb5] font-normal">
               Already have an account?{" "}
@@ -98,7 +98,7 @@ export default function SignUp() {
                           Name
                         </FormLabel>
                         <FormControl>
-                          <Input placeholder="Techwithemma" {...field} />
+                          <Input placeholder="Enter your name" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
@@ -116,7 +116,7 @@ export default function SignUp() {
                         </FormLabel>
                         <FormControl>
                           <Input
-                            placeholder="subscribeto@channel.com"
+                            placeholder="Enter your email"
                             autoComplete="off"
                             {...field}
                           />

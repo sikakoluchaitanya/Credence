@@ -4,6 +4,8 @@ import "./globals.css";
 import { ThemeProvider } from "@/context/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import QueryProvider from "@/context/query-provider";
+import { ClientOnly } from "@/app/(main)/_components/ClientOnly";
+
 
 const doto = Doto({ subsets: ["latin"], weight: ["900"] });
 
@@ -23,11 +25,13 @@ export default function RootLayout({
         <QueryProvider>
           <ThemeProvider
             attribute="class"
-            defaultTheme="system"
+            defaultTheme="dark"
             enableSystem={true}
             disableTransitionOnChange
           >
-            {children}
+            <ClientOnly>
+              {children}
+            </ClientOnly>
             <Toaster />
           </ThemeProvider>
         </QueryProvider>

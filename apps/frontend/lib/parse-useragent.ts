@@ -1,5 +1,5 @@
 import { Laptop, LucideIcon, Smartphone } from "lucide-react"
-import UAParser from "ua-parser-js"
+import { UAParser } from "ua-parser-js"
 import { formatDistanceToNowStrict, isPast, format } from "date-fns"
 
 type DeviceType = "Mobile" | "Desktop"

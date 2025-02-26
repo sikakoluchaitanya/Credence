@@ -82,7 +82,7 @@ const Asidebar = () => {
                 href="/home"
                 className="hidden md:flex ml-2 text-xl tracking-[-0.16px] text-black dark:text-[#fcfdffef] font-bold mb-0"
               >
-                Squeezy
+                Credence
               </Link>
             )}
           </div>
