@@ -9,7 +9,7 @@ type Params = {
     from: string;
 };
 
-export const mailer_sender = config.NODE_ENV === "development" ? `no-reply <onboarding@resend.dev>` : `no-reply <${config.MAILER_SENDER}>`;
+export const mailer_sender = config.NODE_ENV === "development" ? `no-reply@transactional.chaitanya.fun` : `no-reply <${config.MAILER_SENDER}>`;
 
 export const sendEmail = async ({
     to,
