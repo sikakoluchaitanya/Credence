@@ -1,13 +1,11 @@
 "use client";
 import React, { useState } from "react";
 import {
-  ChevronsUpDown,
   EllipsisIcon,
   Home,
   Loader,
   Lock,
   LogOut,
-  MoonIcon,
   MoonStarIcon,
   Settings,
   SunIcon,
@@ -67,7 +65,7 @@ const Asidebar = () => {
 
     {
       title: "Settings",
-      url: "#",
+      url: "/settings",
       icon: Settings,
     },
   ];

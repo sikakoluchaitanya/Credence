@@ -4,15 +4,15 @@ import userModel from "../../database/models/user.model";
 import verificationCodeModel from "../../database/models/verification.modal";
 import { ErrorCode } from "../../shared/enums/error-code.enum";
 import VerificationEnum from "../../shared/enums/verification-code.enum";
-import { LoginDto, RegisterDto, ResetPasswordDto } from "../../shared/interfaces/auth.interface";
+import { ChangePasswordDto, LoginDto, RegisterDto, ResetPasswordDto } from "../../shared/interfaces/auth.interface";
 import { BadRequestException, NotFoundException, UnauthorizedException, HttpException, InternalServerException } from "../../shared/utils/catch-errors";
 import { anHourFromNow, calculateExpirationDate, fortyFiveMinutesFromNow, ONE_DAY_IN_MS, threeMinutesAgo } from "../../shared/utils/time-date";
 import { RefreshTokenPayload, refreshTokenSignOptions, signJwtToken, verifyJwtToken } from "../../shared/utils/jwt";
 import { mailer_sender, sendEmail } from "../../mailers/mailer";
 import { passwordResetTemplate, verifyEmailTemplate } from "../../mailers/templates/templates";
-import { verify } from "jsonwebtoken";
 import { HttpStatus } from "../../config/http.config";
 import { hashValue } from "../../shared/utils/bycrypt";
+import { Response } from "express";
 
 
 export class Authservice {
@@ -207,7 +207,6 @@ export class Authservice {
             throw new NotFoundException("User not found");
         }
 
-        // check email rate limit
         const timeago = threeMinutesAgo();
         const maxAttempts = 2;
 
@@ -284,7 +283,96 @@ export class Authservice {
         return {
             user: updatedUser
         }
-    } 
+    }
+
+    public async ChangePassword(
+        userId: string,
+        { OldPassword, newPassword, confirmPassword }: ChangePasswordDto,
+        res: Response
+    ) {
+        if (newPassword !== confirmPassword) {
+            throw new BadRequestException(
+                "New password and confirm password do not match",
+                ErrorCode.VALIDATION_ERROR
+            );
+        }
+
+        const user = await userModel.findById(userId);
+        if (!user) {
+            throw new NotFoundException("User not found", ErrorCode.AUTH_USER_NOT_FOUND);
+        }
+
+        const isOldPasswordValid = await user.comparePassword(OldPassword);
+        if (!isOldPasswordValid) {
+            throw new BadRequestException(
+                "Invalid old password",
+                ErrorCode.AUTH_INVALID_CREDENTIALS
+            );
+        }
+
+        const hashedPassword = await hashValue(newPassword);
+    
+        const updatedUser = await userModel.findByIdAndUpdate(
+            userId,
+            {
+                password: hashedPassword,
+            },
+            { new: true }
+        );
+    
+        if (!updatedUser) {
+            throw new InternalServerException("Failed to update the password");
+        }
+
+        await sessionModel.deleteMany({
+            userId: updatedUser._id,
+        });
+
+        res.clearCookie("accessToken", { httpOnly: true, secure: true });
+        res.clearCookie("refreshToken", { httpOnly: true, secure: true });
+        res.cookie("user_session", "", { expires: new Date(0), path: "/", secure: true, httpOnly: true });
+        res.clearCookie("user_session", { path: "/", secure: true });
+    
+        return {
+            message: "Password changed successfully",
+            user: updatedUser
+        };
+    }
+
+    public async ChangeEmail(userId: string, email: string, res: Response) {
+        const existingUser = await userModel.findOne({ email });
+    
+        if (existingUser) {
+            throw new BadRequestException(
+                "User already exists with the same email",
+                ErrorCode.AUTH_EMAIL_ALREADY_EXISTS
+            );
+        }
+
+        const updatedUser = await userModel.findByIdAndUpdate(
+            userId,
+            { email, isEmailVerified: false },
+            { new: true }
+        );
+    
+        if (!updatedUser) {
+            throw new InternalServerException("Failed to update email");
+        }
+
+        await sessionModel.deleteMany({ userId: updatedUser._id });
+    
+        res.clearCookie("accessToken", { httpOnly: true, secure: true });
+        res.clearCookie("refreshToken", { httpOnly: true, secure: true });
+        res.cookie("user_session", "", { expires: new Date(0), path: "/", secure: true, httpOnly: true });
+        res.clearCookie("user_session", { path: "/", secure: true });
+
+    
+        return {
+            message: "Email changed successfully. Please log in again.",
+            user: updatedUser,
+        };
+    }
+    
 
     public async logout(sessionId: string) {
         return await sessionModel.findByIdAndDelete(sessionId);

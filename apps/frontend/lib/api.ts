@@ -3,6 +3,12 @@ import API from "./axios-client";
 type forgotPasswordType = { email: string };
 type resetPasswordType = { password: string; verificationCode: string };
 
+type changePasswordType = {
+  OldPassword: string,
+  newPassword: string,
+  confirmPassword: string,
+};
+
 type LoginType = {
   email: string;
   password: string;
@@ -53,6 +59,12 @@ export const forgotPasswordMutationFn = async (data: forgotPasswordType) =>
 
 export const resetPasswordMutationFn = async (data: resetPasswordType) =>
   await API.post(`/auth/password/reset`, data);
+
+export const changePasswordMutationFn = async (data: changePasswordType) =>
+  await API.post(`/auth/password/change`, data);
+
+export const changeEmailMutationFn = async (email: string) =>
+  await API.post(`/auth/ChangeEmail`, { email });
 
 export const verifyMFALoginMutationFn = async (data: mfaLoginType) =>
   await API.post(`/mfa/verify-login`, data);

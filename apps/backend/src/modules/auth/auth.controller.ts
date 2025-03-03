@@ -2,9 +2,10 @@ import { Request, Response } from "express";
 import { asyncHandler } from "../../middlewares/asyncHandler";
 import { Authservice } from "./auth.service";
 import { HttpStatus } from "../../config/http.config";
-import { emailSchema, loginSchema, registerSchema, resetPasswordSchema, verificationEmailSchema } from "../../shared/validators/auth.validator";
+import { changePasswordSchema, emailSchema, loginSchema, registerSchema, resetPasswordSchema, verificationEmailSchema } from "../../shared/validators/auth.validator";
 import { clearAuthenticationCookies, getAccessTokenCookieOptions, getRefreshTokenCookieOptions, setAuthenticationCookies } from "../../shared/utils/cookie";
-import { NotFoundException, UnauthorizedException } from "../../shared/utils/catch-errors";
+import { BadRequestException, NotFoundException, UnauthorizedException } from "../../shared/utils/catch-errors";
+import { ErrorCode } from "../../shared/enums/error-code.enum";
 
 
 export class AuthController {
@@ -112,6 +113,36 @@ export class AuthController {
         }
     )
 
+    public ChangePassword = asyncHandler(
+        async(req: Request, res: Response): Promise<any> => {
+            const user = req.user;
+            if(!user){
+                throw new BadRequestException("User not found",ErrorCode.AUTH_USER_NOT_FOUND);
+            }
+            const body = changePasswordSchema.parse(req.body);
+            await this.authService.ChangePassword(user.id, body,res);
+
+            return res.status(200).json({
+                message: "Password changed successfully",
+            })
+        }
+    )
+
+    public ChangeEmail = asyncHandler(
+        async(req: Request, res: Response): Promise<any> => {
+            const user = req.user;
+            if(!user){
+                throw new BadRequestException("User not found",ErrorCode.AUTH_USER_NOT_FOUND);
+            }
+            const body = emailSchema.parse(req.body.email);
+            await this.authService.ChangeEmail(user.id, body,res);
+
+            return res.status(200).json({
+                message: "Email changed successfully",
+            })
+        }
+    )
+    
     public logout = asyncHandler(
         async(req: Request, res: Response): Promise<any> => {
             const sessionId = req.sessionId;

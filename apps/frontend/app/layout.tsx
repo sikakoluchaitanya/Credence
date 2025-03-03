@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
-import { Doto } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/context/theme-provider";
 import { Toaster } from "@/components/ui/toaster";
 import QueryProvider from "@/context/query-provider";
 import { ClientOnly } from "@/app/(main)/_components/ClientOnly";
 
-
-const doto = Doto({ subsets: ["latin"], weight: ["900"] });
+const inter = Inter({ subsets: ["latin"], weight: ["400", "500", "700"] });
 
 export const metadata: Metadata = {
   title: "Credence Authentication App",
@@ -21,7 +20,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`bg-background ${doto.className} antialiased`}>
+      <body className={`bg-background ${inter.className} antialiased`}>
         <QueryProvider>
           <ThemeProvider
             attribute="class"

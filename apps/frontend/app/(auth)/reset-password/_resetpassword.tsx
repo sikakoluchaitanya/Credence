@@ -33,10 +33,10 @@ export default function ResetPassword() {
 
   const formSchema = z
     .object({
-      password: z.string().trim().min(1, {
+      password: z.string().trim().min(6, {
         message: "Password is required",
       }),
-      confirmPassword: z.string().trim().min(1, {
+      confirmPassword: z.string().trim().min(6, {
         message: "Confirm password is required",
       }),
     })
