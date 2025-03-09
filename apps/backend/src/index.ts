@@ -12,10 +12,17 @@ import passport from "./middlewares/passport";
 import { authenticateJWT } from "./shared/strats/jwt.strategy";
 import sessionRoutes from "./modules/sessions/session.routes";
 import mfaRoutes from "./modules/mfa/mfa.routes";
-
+import swaggerUi from "swagger-ui-express";
+import swaggerJsdoc from "swagger-jsdoc";
+import swaggerOptions from "./swagger.config";
 
 const app = express();
 const BASE_PATH = config.BASE_PATH;
+
+const swaggerDocs = swaggerJsdoc(swaggerOptions)
+console.log(swaggerDocs)
+app.use(`${BASE_PATH}/api-docs`, swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));

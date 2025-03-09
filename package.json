@@ -15,9 +15,12 @@
   "license": "ISC",
   "description": "",
   "devDependencies": {
-    "turbo": "^2.3.3"
+    "turbo": "^2.4.4"
   },
   "dependencies": {
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
+    "tsoa": "^6.6.0",
     "ua-parser-js": "^2.0.2",
     "uuid": "^11.0.5"
   },
